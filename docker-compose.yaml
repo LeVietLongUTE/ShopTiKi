@@ -1,0 +1,58 @@
+version: '3.5'
+
+services:
+  backend:
+    container_name: be_api
+    image: registry.gitlab.com/nhnhan18it1/python-docker
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=nhav
+      - DB_PASSWORD=dnport
+    ports:
+      - "5000:5000"
+    networks:
+      - postgres
+    depends_on:
+      - postgres
+      - pgadmin
+    restart: unless-stopped
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: nhav
+      POSTGRES_PASSWORD: dnport
+      PGDATA: /data/postgres
+    volumes:
+       - /postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - pgadmin:/root/.pgadmin
+    ports:
+      - "1080:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+
+
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+    postgres:
+    pgadmin:
